@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import {
   ArrowRight,
   ArrowLeft,
@@ -18,10 +18,12 @@ export default function Account({
   session,
   onChanged,
   onContinue,
+  active,
 }: {
   session: SessionInfo;
   onChanged: (s: SessionInfo) => void;
   onContinue: () => void;
+  active: boolean;
 }) {
   const [mode, setMode] = useState<"register" | "login" | "recover">(
     "register",
@@ -31,6 +33,20 @@ export default function Account({
   const [show, setShow] = useState(false);
   const [recovery, setRecovery] = useState("");
   const [saved, setSaved] = useState(false);
+  const recoveryDialog = useRef<HTMLDialogElement>(null);
+  useEffect(() => {
+    if (recovery && !recoveryDialog.current?.open)
+      recoveryDialog.current?.showModal();
+  }, [recovery]);
+  useEffect(() => {
+    if (!busy && (!recovery || saved)) return;
+    const warn = (event: BeforeUnloadEvent) => {
+      event.preventDefault();
+      event.returnValue = "";
+    };
+    window.addEventListener("beforeunload", warn);
+    return () => window.removeEventListener("beforeunload", warn);
+  }, [busy, recovery, saved]);
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setBusy(true);
@@ -49,8 +65,10 @@ export default function Account({
         body: JSON.stringify(body),
       });
       onChanged(result);
-      if (result.recovery_code) setRecovery(result.recovery_code);
-      else onContinue();
+      if (result.recovery_code) {
+        setSaved(false);
+        setRecovery(result.recovery_code);
+      } else onContinue();
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -84,13 +102,18 @@ export default function Account({
   }
   if (recovery)
     return (
-      <div className="account-layout recovery-layout">
+      <dialog
+        ref={recoveryDialog}
+        className="recovery-dialog"
+        aria-labelledby="recovery-title"
+        onCancel={(event) => event.preventDefault()}
+      >
         <section className="account-card">
           <span className="auth-icon">
             <ShieldCheck size={28} />
           </span>
           <div className="eyebrow">ONE IMPORTANT THING</div>
-          <h1>Keep your recovery code safe.</h1>
+          <h1 id="recovery-title">Keep your recovery code safe.</h1>
           <p>
             This is how you reset your password if you forget it. We only show
             this code once.
@@ -120,8 +143,9 @@ export default function Account({
             <ArrowRight size={17} />
           </button>
         </section>
-      </div>
+      </dialog>
     );
+  if (!active) return null;
   if (session.user)
     return (
       <>

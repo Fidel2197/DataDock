@@ -39,13 +39,30 @@ describe("session-aware API client", () => {
     );
   });
   it("rotates the write token after account sign-in", async () => {
-    request.mockResolvedValueOnce(new Response(JSON.stringify({csrf_token: "guest"})));
+    request.mockResolvedValueOnce(
+      new Response(JSON.stringify({ csrf_token: "guest" })),
+    );
     await startSession();
-    request.mockResolvedValueOnce(new Response(JSON.stringify({csrf_token: "signed-in", user: {username: "analyst"}})));
-    await api("/auth/login", {method: "POST", body: JSON.stringify({username: "analyst", password: "test-only-password"})});
-    request.mockResolvedValueOnce(new Response(JSON.stringify({ok: true})));
-    await api("/reports/id/clean", {method: "POST", body: "{}"});
-    expect(request.mock.calls[2][1].headers.get("X-CSRF-Token")).toBe("signed-in");
+    request.mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({
+          csrf_token: "signed-in",
+          user: { username: "analyst" },
+        }),
+      ),
+    );
+    await api("/auth/login", {
+      method: "POST",
+      body: JSON.stringify({
+        username: "analyst",
+        password: "test-only-password",
+      }),
+    });
+    request.mockResolvedValueOnce(new Response(JSON.stringify({ ok: true })));
+    await api("/reports/id/clean", { method: "POST", body: "{}" });
+    expect(request.mock.calls[2][1].headers.get("X-CSRF-Token")).toBe(
+      "signed-in",
+    );
   });
   it("handles a proxy HTML error without leaking markup into the UI", async () => {
     request.mockResolvedValue(

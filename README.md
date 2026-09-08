@@ -4,7 +4,9 @@ A working data quality and reporting portal built for research assistants and op
 
 **Stack:** React 19, TypeScript, TanStack Query, Recharts, FastAPI, pandas, NumPy, SQLAlchemy, and PostgreSQL. The Vercel deployment runs the actual Python API and stores accounts, reports, rows, and original uploads in a dedicated hosted PostgreSQL database. Docker Compose and an alternative AWS EC2/S3 deployment are also configured.
 
-**Publication status:** source and production configuration are ready; activating the hosted database requires the account owner to accept Neon's marketplace terms. The public app link will be added after deployment verification.
+**Live app:** [datadock-fidel2197.vercel.app](https://datadock-fidel2197.vercel.app/) · [Quick guide](https://datadock-fidel2197.vercel.app/#guide) · [Fidel's portfolio](https://fidel-portfolio-eta.vercel.app/#datadock)
+
+**Verified online:** uploads, account creation, cross-device sign-in, private report access, charts, CSV/JSON downloads, password recovery, and session revocation on Vercel with Neon PostgreSQL.
 
 ## Try the application
 

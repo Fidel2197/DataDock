@@ -81,7 +81,9 @@ export default function App() {
   }
   function accountChanged(data: SessionInfo) {
     void client.cancelQueries();
-    client.removeQueries({ predicate: (query) => query.queryKey[0] !== "session" });
+    client.removeQueries({
+      predicate: (query) => query.queryKey[0] !== "session",
+    });
     const { recovery_code: _recovery, ...current } = data;
     client.setQueryData(["session"], current);
   }
@@ -186,13 +188,12 @@ export default function App() {
                   onAccount={() => go("account")}
                 />
               )}
-              {route.view === "account" && (
-                <Account
-                  session={session.data!}
-                  onChanged={accountChanged}
-                  onContinue={() => go("uploads")}
-                />
-              )}
+              <Account
+                session={session.data!}
+                active={route.view === "account"}
+                onChanged={accountChanged}
+                onContinue={() => go("uploads")}
+              />
               {route.view === "uploads" && (
                 <Uploads
                   onOpen={opened}

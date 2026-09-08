@@ -9,13 +9,13 @@ This is a solo development backlog. It records scope and suggested estimates; it
 | DD-03 | Choose cleaning rules and download a copy | 3 | Counts match export; independent choices; original unchanged | Implemented, API tested |
 | DD-04 | Explore category comparisons and distributions | 5 | Numeric/text datasets; grouping; count/total/average; exact values | Implemented; aggregation API tested |
 | DD-05 | Reopen a saved report | 3 | Persistent history; session ownership; changed browser cannot read | Implemented, tested |
-| DD-06 | Package the full stack in Docker Compose | 3 | Health checks; PostgreSQL; volumes; Nginx proxy | Authored; container execution pending |
+| DD-06 | Package the full stack in Docker Compose | 3 | Health checks; PostgreSQL; volumes; Nginx proxy | Both images built in GitHub CI; full Compose execution pending |
 | DD-07 | Test/build/publish/deploy through GitLab | 5 | PostgreSQL tests; immutable tags; OIDC; health check and rollback | Authored; remote pipeline pending |
 | DD-08 | Deploy to AWS with HTTPS and private storage | 5 | EC2; S3; IAM role; HTTPS; SSM; restore procedure | Authored; account deployment pending |
 | DD-09 | Measure one performance improvement | 2 | Reproducible input; equivalent results; documented scope | Local benchmark recorded |
 | DD-10 | Keep reports in an optional account | 5 | Registration, login, recovery, revocation, ownership, guest migration | Implemented; account API tests passed |
 | DD-11 | Understand the tool without outside instructions | 2 | Four-step guide, examples, FAQs, clear upload description | Implemented |
-| DD-12 | Publish the Python app on Vercel with durable storage | 3 | Hosted API, PostgreSQL, accounts, original files, public HTTP checks | Database terms acceptance pending |
+| DD-12 | Publish the Python app on Vercel with durable storage | 3 | Hosted API, PostgreSQL, accounts, original files, public HTTP checks | Deployed; live workflow verification passed |
 
 ## Suggested next sprint
 
