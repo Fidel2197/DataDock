@@ -2,18 +2,20 @@
 
 A working data quality and reporting portal built for research assistants and operations analysts. Upload a messy CSV, inspect row-level issues, compare categories, and download a cleaned copy without changing the original.
 
-**Stack:** React 19, TypeScript, TanStack Query, Recharts, FastAPI, pandas, NumPy, SQLAlchemy. PostgreSQL in Docker; SQLite for the local preview. AWS deployment configuration uses EC2, private S3, IAM, Systems Manager, and Nginx. GitLab CI checks, builds, publishes immutable containers, and offers a manual production deployment with rollback.
+**Stack:** React 19, TypeScript, TanStack Query, Recharts, FastAPI, pandas, NumPy, SQLAlchemy, and PostgreSQL. The Vercel deployment runs the actual Python API and stores accounts, reports, rows, and original uploads in a dedicated hosted PostgreSQL database. Docker Compose and an alternative AWS EC2/S3 deployment are also configured.
+
+**Publication status:** source and production configuration are ready; activating the hosted database requires the account owner to accept Neon's marketplace terms. The public app link will be added after deployment verification.
 
 ## Try the application
 
-1. Open **Uploads** and select **Explore sample**.
+1. Open **Uploads**, bring your own CSV, or select **Open example**.
 2. The sample contains 246 synthetic research spending records: 12 missing cells, 6 duplicates, 3 invalid numeric values, 2 outlier suggestions, and 6 cells with extra spaces.
 3. On **Data review**, select **Issues only**, search `pending`, or expand a flagged row.
 4. Apply cleaning options. The default options retain 240 records. Missing data and unusual numbers remain for human review.
 5. Open **Dashboard** and compare actual spending by department. Change the measure, grouping, and aggregation.
 6. Download the cleaned CSV or JSON report, then reopen the report from **Report history**.
 
-The sample is synthetic. There are no invented customers, clearance claims, or simulated production statistics.
+The included example is synthetic. **Quick guide** explains each step. **Your account** lets visitors register, sign in, or recover their password with a private recovery code; guests can continue without an account.
 
 ## Local development
 
@@ -62,19 +64,21 @@ See [verification](docs/verification.md) for checks actually run, and [performan
 
 ## Design and behavior
 
-- Four focused views with hash navigation, browser back/forward, and dataset switching.
+- Six focused views: uploads, data review, dashboard, report history, quick guide, and account.
 - TanStack Query handles remote state, caching, loading, errors, and mutation invalidation. React owns filters and export options.
 - Charts are lazy-loaded; table reads are paginated and indexed by report/row. Search is debounced and performed on the server.
-- Uploads are UTF-8 CSV, at most 10 MB, 100,000 records, 64 columns, and one million cells. Large/wide inputs are rejected with an explanation.
+- Hosted uploads are UTF-8 CSV, at most 3 MB, 100,000 records, 64 columns, and one million cells. The local/Docker default is 10 MB. The API supplies the active limit to the interface.
 - Duplicates compare all trimmed fields. Numeric inference needs 80% finite numeric values and excludes identifiers. Outliers use the 1.5× IQR rule and are suggestions, not mistakes to erase.
 - Headers, leading-zero identifiers, quoted multiline fields, and literal `NA`/`null` are preserved. Only blank or whitespace-only cells count as missing.
 - Export cleaning is opt-in and repeatable. Formula-like strings in CSV exports receive an apostrophe for safer spreadsheet opening; finite negative numbers remain numeric.
-- Reports belong to a random HttpOnly browser session cookie. SQL queries enforce ownership on every report route. Writes require a CSRF token. Clearing the cookie loses access to that workspace; this is not a named-account authentication system.
+- Reports belong to a guest session or named account. Each report route checks ownership. Sessions use opaque HttpOnly cookies, database-side revocation, a 30-day expiry, and CSRF protection. Vercel always uses Secure cookies.
+- Passwords use scrypt with random salts. Account recovery uses a high-entropy, one-time recovery code stored only as a hash. Resetting a password rotates that code and revokes other sessions. No email delivery is required.
+- Signing in can transfer current guest reports into the account. Auth transitions clear cached report data, and account operations are rate-limited in the database.
 
 ## Architecture and deployment
 
-See [architecture](docs/architecture.md), [AWS runbook](docs/aws-deployment.md), and [development backlog](docs/backlog.md).
+See [architecture](docs/architecture.md), [Vercel deployment](docs/vercel-deployment.md), [AWS runbook](docs/aws-deployment.md), and [development backlog](docs/backlog.md).
 
-**Deployment status:** working local application and build; AWS resources and GitLab pipeline execution are pending account setup. Configuration files are evidence of implementation, not evidence of having operated a live AWS service. Future résumé claims should distinguish these stages.
+GitHub Actions runs Python tests against PostgreSQL, frontend checks, and container builds. The GitLab pipeline additionally configures immutable image publication and a manual AWS rollout with rollback. AWS resources and GitLab pipeline execution have not been deployed or operated; the repository documents this distinction.
 
-This is a bounded portfolio application, not a regulated-data platform. It has session quotas and upload limits. Long-running jobs, cross-device accounts, shared workspaces, retention automation, and high-availability infrastructure are outside version 1. Do not upload confidential records to a public demo.
+Workspaces have a 30-report limit. Shared teams, background jobs, email recovery, and retention automation are not implemented. Guest access depends on the browser cookie; an account preserves access across devices. Save the recovery code when creating an account.

@@ -2,7 +2,14 @@ import type { View } from "./types";
 export function readRoute(): { view: View; id: string } {
   const [view, id = ""] = window.location.hash.slice(1).split("/");
   return {
-    view: ["uploads", "review", "dashboard", "history"].includes(view)
+    view: [
+      "uploads",
+      "review",
+      "dashboard",
+      "history",
+      "guide",
+      "account",
+    ].includes(view)
       ? (view as View)
       : "uploads",
     id: /^[a-f0-9-]{36}$/.test(id) ? id : "",

@@ -8,7 +8,7 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import { bytes, date, number } from "./utils";
-import type { ReportSummary } from "./types";
+import type { ReportSummary, User } from "./types";
 export default function ReportHistory({
   reports,
   loading,
@@ -16,6 +16,7 @@ export default function ReportHistory({
   retry,
   onOpen,
   onUpload,
+  user,
 }: {
   reports: ReportSummary[];
   loading: boolean;
@@ -23,6 +24,7 @@ export default function ReportHistory({
   retry: () => void;
   onOpen: (id: string) => void;
   onUpload: () => void;
+  user: User | null;
 }) {
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState("recent");
@@ -83,7 +85,7 @@ export default function ReportHistory({
             <Search size={17} />
             <input
               aria-label="Search saved reports"
-              placeholder="Find a dataset…"
+              placeholder="Find a datasetâ€¦"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
@@ -99,7 +101,7 @@ export default function ReportHistory({
         </div>
         {loading ? (
           <div className="table-message" role="status">
-            Loading reports…
+            Loading reportsâ€¦
           </div>
         ) : error ? (
           <div className="table-message inline-error" role="alert">
@@ -154,8 +156,8 @@ export default function ReportHistory({
                             {r.name}
                           </button>
                           <small>
-                            {bytes(r.byte_size)} · {r.column_count} columns
-                            {r.sample ? " · Sample" : ""}
+                            {bytes(r.byte_size)} Â· {r.column_count} columns
+                            {r.sample ? " Â· Sample" : ""}
                           </small>
                         </div>
                       </div>
@@ -200,9 +202,15 @@ export default function ReportHistory({
       <div className="history-note">
         <CheckCircle2 size={17} />
         <p>
-          Reports are stored on the server and linked to this browser’s session
-          cookie. They survive refreshes. A different browser or cleared cookie
-          opens a separate workspace.
+          {user ? (
+            "Your reports are saved to your account. Sign in on any device to pick up where you left off."
+          ) : (
+            <>
+              Guest reports stay in this browser’s workspace.{" "}
+              <a href="#account">Create an account</a> to keep them across
+              devices.
+            </>
+          )}
         </p>
       </div>
     </>

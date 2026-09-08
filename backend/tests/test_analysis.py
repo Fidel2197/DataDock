@@ -68,7 +68,7 @@ def test_limits():
         parse_csv(b"a\n1\n2", Settings(max_rows=1))
     with pytest.raises(DatasetError, match="64"):
         parse_csv(b"a,b\n1,2", Settings(max_columns=1))
-    with pytest.raises(DatasetError, match="10 MB"):
+    with pytest.raises(DatasetError, match="exceeds"):
         parse_csv(b"a,b\n1,2", Settings(max_upload_bytes=1))
 
 

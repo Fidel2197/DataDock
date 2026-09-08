@@ -13,10 +13,13 @@ This is a solo development backlog. It records scope and suggested estimates; it
 | DD-07 | Test/build/publish/deploy through GitLab | 5 | PostgreSQL tests; immutable tags; OIDC; health check and rollback | Authored; remote pipeline pending |
 | DD-08 | Deploy to AWS with HTTPS and private storage | 5 | EC2; S3; IAM role; HTTPS; SSM; restore procedure | Authored; account deployment pending |
 | DD-09 | Measure one performance improvement | 2 | Reproducible input; equivalent results; documented scope | Local benchmark recorded |
+| DD-10 | Keep reports in an optional account | 5 | Registration, login, recovery, revocation, ownership, guest migration | Implemented; account API tests passed |
+| DD-11 | Understand the tool without outside instructions | 2 | Four-step guide, examples, FAQs, clear upload description | Implemented |
+| DD-12 | Publish the Python app on Vercel with durable storage | 3 | Hosted API, PostgreSQL, accounts, original files, public HTTP checks | Database terms acceptance pending |
 
 ## Suggested next sprint
 
-Finish DD-06 through DD-08 with the account owner, record deployment evidence, then conduct a real review of the demo. Use this backlog in Jira if desired. Add actual dates, outcomes, revisions, and blockers as they happen; do not fabricate earlier planning history.
+Finish the hosted rollout and record deployment evidence. AWS is an alternative deployment, with its own remaining operational checks. Use this backlog in Jira if desired and record actual planning events as they occur.
 
 ## Review questions
 

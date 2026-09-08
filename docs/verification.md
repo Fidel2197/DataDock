@@ -2,7 +2,7 @@
 
 ## Completed locally
 
-- **18 Python tests passed** against temporary SQLite databases: deterministic profiling counts, cleaning options, unchanged originals, malformed and oversized uploads, CSV identifiers and quoted multiline fields, formula-safe export, constant/empty columns, session isolation, CSRF, pagination, escaped search, chart grouping, persistence after reopening the application, and local/S3 storage contracts.
+- **21 Python tests passed** against temporary SQLite databases: profiling, cleaning, preserved originals, validation, formula-safe export, session isolation, CSRF, pagination, escaped search, charts, storage adapters, account registration/login, password recovery, old-session revocation, cross-device report access, durable original files, recovery-code rotation, auth throttling, and migration quota enforcement.
 - **3 frontend tests passed**: CSRF header propagation with same-origin cookies, actionable API errors, and safe fallback handling for an HTML proxy error.
 - **TypeScript and Vite production build passed.** The dashboard and chart dependencies are separate lazy-loaded chunks.
 - **Ruff lint/format passed** for backend source/tests; frontend source formatted with Prettier.

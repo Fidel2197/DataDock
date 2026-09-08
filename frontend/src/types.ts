@@ -1,4 +1,13 @@
-export type View = "uploads" | "review" | "dashboard" | "history";
+export type View =
+  "uploads" | "review" | "dashboard" | "history" | "guide" | "account";
+export type User = { id: string; username: string; name: string };
+export type SessionInfo = {
+  csrf_token: string;
+  user: User | null;
+  max_upload_mb: number;
+  max_rows: number;
+  recovery_code?: string;
+};
 export type CleanOptions = {
   trim_whitespace: boolean;
   drop_duplicates: boolean;

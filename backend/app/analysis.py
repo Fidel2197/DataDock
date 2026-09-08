@@ -16,7 +16,7 @@ class DatasetError(ValueError):
 
 def parse_csv(content: bytes, settings: Settings) -> pd.DataFrame:
     if len(content) > settings.max_upload_bytes:
-        raise DatasetError("This file exceeds the 10 MB limit.")
+        raise DatasetError(f"This file exceeds the {settings.max_upload_bytes // (1024 * 1024)} MB limit.")
     try:
         text = content.decode("utf-8-sig")
     except UnicodeDecodeError as exc:

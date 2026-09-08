@@ -12,19 +12,25 @@ import {
   X,
   LoaderCircle,
   FileSpreadsheet,
+  BookOpen,
+  UserRound,
 } from "lucide-react";
 import { api, startSession } from "./api";
 import { readRoute } from "./utils";
-import type { Report, ReportSummary, View } from "./types";
+import type { Report, ReportSummary, View, SessionInfo } from "./types";
 import Uploads from "./Uploads";
 import Review from "./Review";
 import ReportHistory from "./ReportHistory";
+import Guide from "./Guide";
+import Account from "./Account";
 const Dashboard = lazy(() => import("./Dashboard"));
 const labels: Record<View, string> = {
   uploads: "Uploads",
   review: "Data review",
   dashboard: "Dashboard",
   history: "Report history",
+  guide: "Quick guide",
+  account: "Your account",
 };
 export default function App() {
   const [route, setRoute] = useState(readRoute);
@@ -73,6 +79,12 @@ export default function App() {
     void client.invalidateQueries({ queryKey: ["reports"] });
     go("review", data.id);
   }
+  function accountChanged(data: SessionInfo) {
+    void client.cancelQueries();
+    client.removeQueries({ predicate: (query) => query.queryKey[0] !== "session" });
+    const { recovery_code: _recovery, ...current } = data;
+    client.setQueryData(["session"], current);
+  }
   const ready = session.isSuccess;
   return (
     <div className="app-shell">
@@ -91,6 +103,7 @@ export default function App() {
               [Table2, "review"],
               [ChartNoAxesCombined, "dashboard"],
               [History, "history"],
+              [BookOpen, "guide"],
             ] as const
           ).map(([Icon, key]) => (
             <a
@@ -108,46 +121,58 @@ export default function App() {
           ))}
         </nav>
         <div className="sidebar-note">
-          <ShieldCheck size={20} />
-          <strong>Your data, in context.</strong>
+          <ShieldCheck size={21} />
+          <strong>
+            {session.data?.user
+              ? "Your work stays with you."
+              : "Start here. Keep it anywhere."}
+          </strong>
           <p>
-            Reports are saved for this browser session. Clearing cookies starts
-            a new workspace.
+            {session.data?.user
+              ? "Your reports are saved to your account and ready on your next device."
+              : "Create an account to keep your reports across devices."}
           </p>
-        </div>
-        <div className="sidebar-footer">
-          <span className="avatar">FA</span>
-          <div>
-            Fidel Anyanwu<small>Portfolio project</small>
-          </div>
-          <a
-            href="https://fidel-portfolio-eta.vercel.app/"
-            target="_blank"
-            rel="noreferrer"
-            aria-label="Open Fidel's portfolio"
-          >
-            <ArrowUpRight size={16} />
+          <a href="#guide">
+            A quick introduction <ArrowUpRight size={14} />
           </a>
         </div>
+        <a href="#account" className="sidebar-footer account-footer">
+          <span className="avatar">
+            {session.data?.user?.name.slice(0, 2).toUpperCase() || (
+              <UserRound size={18} />
+            )}
+          </span>
+          <div>
+            {session.data?.user?.name || "Your workspace"}
+            <small>
+              {session.data?.user
+                ? "@" + session.data.user.username
+                : "Sign in or create an account"}
+            </small>
+          </div>
+          <ArrowUpRight size={16} />
+        </a>
       </aside>
       <main>
         <header className="topbar">
           <span>
             Workspace <span className="slash">/</span> {labels[route.view]}
           </span>
-          <span className="environment">
-            <i className={ready ? "" : "offline"} />
-            {session.isError
-              ? "Service unavailable"
-              : ready
-                ? "Session workspace"
-                : "Connecting…"}
-          </span>
+          <div className="topbar-actions">
+            <a href="#guide" className="topbar-guide">
+              <BookOpen size={16} />
+              Quick guide
+            </a>
+            <a href="#account" className="account-button">
+              <UserRound size={16} />
+              {session.data?.user ? session.data.user.name : "Sign in"}
+            </a>
+          </div>
         </header>
         <div className="page">
           {session.isError ? (
             <ErrorPanel
-              message="The analysis service couldn’t be reached. Start the Python API, then reconnect."
+              message="We couldn’t reach your workspace. Please try again in a moment."
               action={() => void session.refetch()}
               label="Reconnect"
             />
@@ -155,9 +180,24 @@ export default function App() {
             <Loading label="Opening your workspace…" />
           ) : (
             <>
+              {route.view === "guide" && (
+                <Guide
+                  onUpload={() => go("uploads")}
+                  onAccount={() => go("account")}
+                />
+              )}
+              {route.view === "account" && (
+                <Account
+                  session={session.data!}
+                  onChanged={accountChanged}
+                  onContinue={() => go("uploads")}
+                />
+              )}
               {route.view === "uploads" && (
                 <Uploads
                   onOpen={opened}
+                  maxUploadMb={session.data?.max_upload_mb || 3}
+                  onGuide={() => go("guide")}
                   onHistory={() => go("history")}
                   reports={reports.data || []}
                   notify={setNotice}
@@ -171,6 +211,7 @@ export default function App() {
                   retry={() => void reports.refetch()}
                   onOpen={(id) => go("review", id)}
                   onUpload={() => go("uploads")}
+                  user={session.data?.user || null}
                 />
               )}
               {(route.view === "review" || route.view === "dashboard") && (
@@ -210,7 +251,7 @@ export default function App() {
                           ))}
                         </select>
                         {report.data.sample && (
-                          <span className="badge blue">Sample data</span>
+                          <span className="badge blue">Example dataset</span>
                         )}
                       </div>
                       {route.view === "review" ? (
@@ -243,8 +284,12 @@ export default function App() {
           <span>
             DataDock <span> / </span> From data to clarity
           </span>
-          <a href="/api/openapi.json" target="_blank" rel="noreferrer">
-            API schema <ArrowUpRight size={12} />
+          <a
+            href="https://fidel-portfolio-eta.vercel.app/"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Built by Fidel Anyanwu <ArrowUpRight size={12} />
           </a>
         </footer>
       </main>

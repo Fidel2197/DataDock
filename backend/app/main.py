@@ -1,9 +1,7 @@
-import hashlib
 import io
 import json
 import logging
 import re
-import secrets
 import time
 from contextlib import asynccontextmanager
 from datetime import timezone
@@ -28,16 +26,16 @@ from .analysis import (
     sample_csv,
     spreadsheet_safe_csv,
 )
+from .auth import Authentication
 from .config import Settings, settings
-from .models import Base, DataRow, Report
-from .storage import Storage
+from .models import Account, AuthSession, Base, DataRow, Report
+from .storage import DatabaseStorage, Storage
 
 logger = logging.getLogger("datadock")
 logger.setLevel(logging.INFO)
 if not logger.handlers:
     logger.addHandler(logging.StreamHandler())
 logger.propagate = False
-COOKIE = "datadock_session"
 
 
 class CleanOptions(BaseModel):
@@ -57,7 +55,7 @@ def create_app(config: Settings = settings) -> FastAPI:
         ),
     )
     sessions = sessionmaker(engine, expire_on_commit=False)
-    storage = Storage(config)
+    storage = DatabaseStorage(sessions) if config.storage_backend == "database" else Storage(config)
     work_slot = BoundedSemaphore(1)
 
     def bounded_work(function):
@@ -93,15 +91,9 @@ def create_app(config: Settings = settings) -> FastAPI:
         with sessions() as session:
             yield session
 
-    def owner(request: Request) -> str:
-        token = request.cookies.get(COOKIE, "")
-        if not re.fullmatch(r"[a-f0-9]{64}", token):
-            raise HTTPException(401, "Open a workspace session before continuing.")
-        if request.method not in {"GET", "HEAD", "OPTIONS"}:
-            expected = hashlib.sha256(("csrf:" + token).encode()).hexdigest()
-            if not secrets.compare_digest(request.headers.get("x-csrf-token", ""), expected):
-                raise HTTPException(403, "Your session needs a refresh. Reload the page and try again.")
-        return hashlib.sha256(token.encode()).hexdigest()
+    authentication = Authentication(config, sessions)
+    owner = authentication.owner
+    app.include_router(authentication.router())
 
     def owned_report(report_id: str, session: Session, owner_id: str) -> Report:
         report = session.scalar(select(Report).where(Report.id == report_id, Report.owner == owner_id))
@@ -153,37 +145,19 @@ def create_app(config: Settings = settings) -> FastAPI:
         session.execute(text("SELECT 1"))
         return {"status": "ok", "version": "1.0.0", "database": "ready"}
 
-    @app.get("/api/session")
-    def get_session(request: Request, response: Response):
-        token = request.cookies.get(COOKIE, "")
-        if not re.fullmatch(r"[a-f0-9]{64}", token):
-            token = secrets.token_hex(32)
-        response.set_cookie(
-            COOKIE,
-            token,
-            httponly=True,
-            secure=config.secure_cookies,
-            samesite="strict",
-            max_age=60 * 60 * 24 * 30,
-            path="/",
-        )
-        return {
-            "csrf_token": hashlib.sha256(("csrf:" + token).encode()).hexdigest(),
-            "storage": "s3" if config.s3_bucket else "local",
-            "max_upload_mb": 10,
-            "max_rows": config.max_rows,
-        }
-
     @bounded_work
     def create_report(content: bytes, name: str, owner_id: str, session: Session, is_sample=False):
+        # Serialize quota checks and guest migration for this workspace across instances.
+        if len(owner_id) == 36:
+            session.scalar(select(Account).where(Account.id == owner_id).with_for_update())
+        else:
+            session.scalar(select(AuthSession).where(AuthSession.token_hash == owner_id).with_for_update())
         count = session.scalar(select(func.count()).select_from(Report).where(Report.owner == owner_id))
         if count >= config.max_reports_per_session:
             raise HTTPException(429, "This workspace has reached its 30-report limit.")
         total = session.scalar(select(func.count()).select_from(Report))
         if total >= config.max_reports_total:
-            raise HTTPException(
-                503, "The demo has reached its storage limit. Please contact the workspace operator."
-            )
+            raise HTTPException(503, "Storage is currently full. Please try again later.")
         try:
             frame = parse_csv(content, config)
             profile, issues = profile_dataset(frame)
@@ -236,7 +210,9 @@ def create_app(config: Settings = settings) -> FastAPI:
                 raise HTTPException(422, "Choose a .csv file.")
             content = await file.read(config.max_upload_bytes + 1)
             if len(content) > config.max_upload_bytes:
-                raise HTTPException(413, "This file exceeds the 10 MB limit.")
+                raise HTTPException(
+                    413, f"This file exceeds the {config.max_upload_bytes // (1024 * 1024)} MB limit."
+                )
             name = re.sub(r"[^\w .()\-]", "_", file.filename.replace("\\", "/").split("/")[-1])[:180]
             return await run_in_threadpool(create_report, content, name, owner_id, session)
         finally:

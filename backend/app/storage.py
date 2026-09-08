@@ -1,6 +1,31 @@
 from pathlib import Path
 
 from .config import Settings
+from .models import StoredUpload
+
+
+class DatabaseStorage:
+    """Durable bounded uploads in Postgres for serverless deployment."""
+
+    def __init__(self, sessions):
+        self.sessions = sessions
+
+    def put(self, key: str, content: bytes) -> None:
+        with self.sessions.begin() as session:
+            session.add(StoredUpload(key=key, content=content))
+
+    def get(self, key: str) -> bytes:
+        with self.sessions() as session:
+            row = session.get(StoredUpload, key)
+            if row is None:
+                raise FileNotFoundError("The original upload is unavailable.")
+            return row.content
+
+    def delete(self, key: str) -> None:
+        with self.sessions.begin() as session:
+            row = session.get(StoredUpload, key)
+            if row:
+                session.delete(row)
 
 
 class Storage:

@@ -1,7 +1,7 @@
-import type { Report } from "./types";
+import type { Report, SessionInfo } from "./types";
 let csrf = "";
 export async function startSession() {
-  const data = await api<{ csrf_token: string; storage: string }>("/session");
+  const data = await api<SessionInfo>("/session");
   csrf = data.csrf_token;
   return data;
 }
@@ -29,7 +29,9 @@ export async function api<T>(
     }
     throw new Error(message);
   }
-  return response.json() as Promise<T>;
+  const data = await response.json();
+  if (typeof data?.csrf_token === "string") csrf = data.csrf_token;
+  return data as T;
 }
 export function uploadFile(
   file: File,

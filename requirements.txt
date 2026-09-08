@@ -1,0 +1,7 @@
+# Production-only dependencies for the Vercel Python function.
+fastapi==0.141.1
+pandas==2.3.3
+numpy==2.5.3
+SQLAlchemy==2.0.52
+psycopg[binary]==3.3.5
+python-multipart==0.0.32
