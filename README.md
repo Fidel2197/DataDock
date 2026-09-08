@@ -67,6 +67,8 @@ See [verification](docs/verification.md) for checks actually run, and [performan
 ## Design and behavior
 
 - Six focused views: uploads, data review, dashboard, report history, quick guide, and account.
+- Collapsible navigation with an elevated account control. The sidebar contains its own overflow on short viewports; the main document scrolls normally, and route changes return to the top.
+- Coordinated WebP backgrounds add visual detail to introductions while keeping data tables and charts clear. See [visual assets and prompts](docs/visual-assets.md).
 - TanStack Query handles remote state, caching, loading, errors, and mutation invalidation. React owns filters and export options.
 - Charts are lazy-loaded; table reads are paginated and indexed by report/row. Search is debounced and performed on the server.
 - Hosted uploads are UTF-8 CSV, at most 3 MB, 100,000 records, 64 columns, and one million cells. The local/Docker default is 10 MB. The API supplies the active limit to the interface.

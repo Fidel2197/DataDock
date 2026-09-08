@@ -49,8 +49,7 @@ p {
 }
 h1,
 h2,
-h3,
-.brand {
+h3 {
   font-family: "Manrope", system-ui, sans-serif;
 }
 h1 {
@@ -70,143 +69,6 @@ p {
   font-size: 1rem;
   line-height: 1.65;
   color: var(--muted);
-}
-.app-shell {
-  min-height: 100vh;
-  display: grid;
-  grid-template-columns: 244px minmax(0, 1fr);
-}
-.sidebar {
-  background: var(--navy);
-  color: #d5e2e8;
-  position: sticky;
-  top: 0;
-  height: 100vh;
-  padding: 32px 20px 20px;
-  display: flex;
-  flex-direction: column;
-}
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 1.48rem;
-  font-weight: 800;
-  text-decoration: none;
-  color: white;
-  letter-spacing: -0.6px;
-  padding: 0 8px;
-}
-.brand-mark {
-  background: var(--mint);
-  color: var(--navy);
-  height: 37px;
-  width: 37px;
-  border-radius: 10px;
-  display: grid;
-  place-items: center;
-}
-.brand-dot {
-  color: var(--mint);
-  margin-left: -8px;
-}
-.workspace-label {
-  font-size: 0.75rem;
-  letter-spacing: 1.6px;
-  color: #8faab7;
-  margin: 48px 14px 17px;
-}
-.sidebar nav {
-  display: grid;
-  gap: 6px;
-}
-.nav-item {
-  display: flex;
-  gap: 13px;
-  align-items: center;
-  border: 0;
-  background: none;
-  color: #bacdd6;
-  padding: 14px 16px;
-  text-align: left;
-  border-radius: 7px;
-  font-size: 0.9rem;
-  min-height: 48px;
-  text-decoration: none;
-}
-.nav-item.active {
-  background: #244754;
-  color: white;
-  box-shadow: inset 3px 0 var(--mint);
-}
-.nav-item:hover {
-  background: #244754;
-}
-.nav-item.active svg {
-  color: var(--mint);
-}
-.sidebar-note {
-  margin: auto 12px 32px;
-  padding-top: 35px;
-}
-.sidebar-note svg {
-  color: var(--mint);
-  margin-bottom: 12px;
-}
-.sidebar-note strong {
-  display: block;
-  font-size: 0.9rem;
-  font-weight: 500;
-  color: #d9e6eb;
-}
-.sidebar-note p {
-  font-size: 0.8rem;
-  line-height: 1.65;
-  color: #8faab7;
-  margin-top: 8px;
-}
-.sidebar-footer {
-  border-top: 1px solid #304b58;
-  padding: 22px 5px 0;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 0.85rem;
-}
-.sidebar-footer small {
-  display: block;
-  color: #8faab7;
-  font-size: 0.75rem;
-  margin-top: 3px;
-}
-.sidebar-footer > svg {
-  margin-left: auto;
-}
-.avatar {
-  display: grid;
-  place-items: center;
-  background: #38535d;
-  color: #e1eeef;
-  border-radius: 50%;
-  width: 35px;
-  height: 35px;
-  font-size: 0.75rem;
-}
-.topbar {
-  min-height: 77px;
-  border-bottom: 1px solid var(--line);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 15px 42px;
-  background: white;
-  font-size: 0.85rem;
-  color: var(--muted);
-  gap: 12px;
-}
-.slash {
-  margin: 0 13px;
-  color: #adbbc3;
 }
 .environment {
   display: flex;
@@ -403,17 +265,8 @@ p {
   }
 }
 @media (max-width: 1100px) {
-  .app-shell {
-    grid-template-columns: 210px minmax(0, 1fr);
-  }
-  .sidebar {
-    padding: 28px 14px 18px;
-  }
   .page {
     padding: 30px 26px;
-  }
-  .topbar {
-    padding: 15px 26px;
   }
   .sample-card {
     flex-wrap: wrap;
@@ -424,50 +277,10 @@ p {
   .flow-grid {
     gap: 16px;
   }
-  .brand {
-    font-size: 1.3rem;
-  }
 }
 @media (max-width: 760px) {
-  .app-shell {
-    display: block;
-  }
-  .sidebar {
-    height: auto;
-    position: relative;
-    padding: 18px 16px 10px;
-  }
-  .sidebar nav {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    margin-top: 21px;
-    gap: 5px;
-  }
-  .nav-item {
-    flex-direction: column;
-    gap: 7px;
-    justify-content: center;
-    text-align: center;
-    font-size: 0.75rem;
-    padding: 12px 4px;
-  }
-  .nav-item.active {
-    box-shadow: inset 0 -2px var(--mint);
-  }
-  .brand {
-    font-size: 1.3rem;
-  }
-  .workspace-label,
-  .sidebar-note,
-  .sidebar-footer {
-    display: none;
-  }
   .page {
     padding: 27px 20px;
-  }
-  .topbar {
-    padding: 13px 20px;
-    min-height: 60px;
   }
   .page-heading {
     margin-bottom: 24px;
@@ -504,17 +317,6 @@ p {
   .environment {
     font-size: 0.72rem;
   }
-  .topbar > span {
-    font-size: 0.78rem;
-  }
-  .slash {
-    margin: 0 7px;
-  }
-}
-.app-shell > main {
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
 }
 .page {
   width: 100%;
@@ -538,14 +340,6 @@ p {
   align-items: center;
   gap: 5px;
   text-decoration: none;
-}
-.nav-count {
-  margin-left: auto;
-  color: #aecbcf;
-  font-size: 0.75rem;
-}
-.sidebar-footer > a {
-  margin-left: auto;
 }
 .offline {
   background: #d4a85e !important;
@@ -1491,9 +1285,6 @@ select {
     padding: 18px 20px;
     flex-wrap: wrap;
   }
-  .nav-count {
-    display: none;
-  }
   .dataset-switcher {
     margin: 0 0 23px;
   }
@@ -1626,67 +1417,6 @@ select,
   --navy: #102c3a;
   --mint: #8debd5;
   background: #f2f6f9;
-}
-.sidebar {
-  background:
-    radial-gradient(ellipse at 5% 0%, #255364 0%, transparent 55%),
-    linear-gradient(170deg, #122f40, #102b39 60%, #0d2631);
-}
-.sidebar .brand-mark {
-  box-shadow: 0 5px 20px #061b2840;
-  background: linear-gradient(135deg, #a6f1d6, #62d6cf);
-}
-.sidebar-note a {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  color: #99ddcd;
-  font-size: 0.78rem;
-  margin-top: 17px;
-  text-decoration: none;
-}
-.sidebar-note a:hover {
-  text-decoration: underline;
-}
-.account-footer {
-  text-decoration: none;
-}
-.account-footer:hover {
-  color: #fff;
-}
-.account-footer .avatar {
-  background: #285561;
-  color: #b3f0db;
-}
-.topbar {
-  background: #ffffffde;
-  backdrop-filter: blur(14px);
-}
-.topbar-actions {
-  display: flex;
-  align-items: center;
-  gap: 22px;
-}
-.topbar-guide {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  color: #718791;
-  text-decoration: none;
-  font-size: 0.8rem;
-}
-.account-button {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: #f0f7f5;
-  border: 1px solid #dcebe5;
-  padding: 9px 13px;
-  border-radius: 7px;
-  text-decoration: none;
-  color: #347969;
-  font-size: 0.8rem;
-  font-weight: 550;
 }
 .accent-word {
   color: #087f76;
@@ -2419,25 +2149,6 @@ select,
   }
 }
 @media (max-width: 760px) {
-  .sidebar nav {
-    grid-template-columns: repeat(5, 1fr);
-  }
-  .nav-item {
-    font-size: 0.68rem;
-  }
-  .nav-item svg {
-    height: 18px;
-  }
-  .topbar-actions {
-    gap: 10px;
-  }
-  .topbar-guide {
-    display: none;
-  }
-  .account-button {
-    font-size: 0.75rem;
-    padding: 8px 10px;
-  }
   .page-heading h1 {
     font-size: 1.85rem;
   }
@@ -2540,9 +2251,6 @@ select,
   }
   .profile-card {
     padding: 32px 23px;
-  }
-  .sidebar-note {
-    display: none;
   }
 }
 .recovery-dialog {

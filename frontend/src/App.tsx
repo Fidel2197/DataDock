@@ -1,19 +1,16 @@
 import { lazy, Suspense, useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
-  Database,
   Upload,
-  Table2,
-  ChartNoAxesCombined,
-  History,
   ArrowUpRight,
-  ShieldCheck,
   AlertCircle,
   X,
   LoaderCircle,
   FileSpreadsheet,
   BookOpen,
   UserRound,
+  PanelLeftClose,
+  PanelLeftOpen,
 } from "lucide-react";
 import { api, startSession } from "./api";
 import { readRoute } from "./utils";
@@ -23,6 +20,7 @@ import Review from "./Review";
 import ReportHistory from "./ReportHistory";
 import Guide from "./Guide";
 import Account from "./Account";
+import Sidebar from "./Sidebar";
 const Dashboard = lazy(() => import("./Dashboard"));
 const labels: Record<View, string> = {
   uploads: "Uploads",
@@ -35,6 +33,27 @@ const labels: Record<View, string> = {
 export default function App() {
   const [route, setRoute] = useState(readRoute);
   const [notice, setNotice] = useState("");
+  const [collapsed, setCollapsed] = useState(() => {
+    try {
+      return (
+        localStorage.getItem("datadock.sidebar") === "collapsed" ||
+        (localStorage.getItem("datadock.sidebar") === null &&
+          window.matchMedia("(max-width: 760px)").matches)
+      );
+    } catch {
+      return window.matchMedia("(max-width: 760px)").matches;
+    }
+  });
+  function toggleSidebar() {
+    const next = !collapsed;
+    setCollapsed(next);
+    try {
+      localStorage.setItem("datadock.sidebar", next ? "collapsed" : "expanded");
+    } catch {
+      /* A layout preference remains usable without browser storage. */
+    }
+    if (window.matchMedia("(max-width: 760px)").matches) window.scrollTo(0, 0);
+  }
   const client = useQueryClient();
   const session = useQuery({
     queryKey: ["session"],
@@ -63,7 +82,8 @@ export default function App() {
   }, []);
   useEffect(() => {
     document.title = `${labels[route.view]} · DataDock`;
-  }, [route.view]);
+    window.scrollTo(0, 0);
+  }, [route.view, route.id]);
   useEffect(() => {
     if (!notice) return;
     const timer = setTimeout(() => setNotice(""), 7000);
@@ -89,77 +109,46 @@ export default function App() {
   }
   const ready = session.isSuccess;
   return (
-    <div className="app-shell">
-      <aside className="sidebar">
-        <a className="brand" href="#uploads" aria-label="DataDock home">
-          <span className="brand-mark">
-            <Database size={23} />
-          </span>
-          DataDock<span className="brand-dot">.</span>
-        </a>
-        <div className="workspace-label">ANALYST WORKSPACE</div>
-        <nav aria-label="Main navigation">
-          {(
-            [
-              [Upload, "uploads"],
-              [Table2, "review"],
-              [ChartNoAxesCombined, "dashboard"],
-              [History, "history"],
-              [BookOpen, "guide"],
-            ] as const
-          ).map(([Icon, key]) => (
-            <a
-              href={`#${key}${selectedId && (key === "review" || key === "dashboard") ? "/" + selectedId : ""}`}
-              key={key}
-              aria-current={route.view === key ? "page" : undefined}
-              className={"nav-item " + (route.view === key ? "active" : "")}
-            >
-              <Icon size={19} />
-              {labels[key]}
-              {key === "history" && !!reports.data?.length && (
-                <span className="nav-count">{reports.data.length}</span>
-              )}
-            </a>
-          ))}
-        </nav>
-        <div className="sidebar-note">
-          <ShieldCheck size={21} />
-          <strong>
-            {session.data?.user
-              ? "Your work stays with you."
-              : "Start here. Keep it anywhere."}
-          </strong>
-          <p>
-            {session.data?.user
-              ? "Your reports are saved to your account and ready on your next device."
-              : "Create an account to keep your reports across devices."}
-          </p>
-          <a href="#guide">
-            A quick introduction <ArrowUpRight size={14} />
-          </a>
-        </div>
-        <a href="#account" className="sidebar-footer account-footer">
-          <span className="avatar">
-            {session.data?.user?.name.slice(0, 2).toUpperCase() || (
-              <UserRound size={18} />
-            )}
-          </span>
-          <div>
-            {session.data?.user?.name || "Your workspace"}
-            <small>
-              {session.data?.user
-                ? "@" + session.data.user.username
-                : "Sign in or create an account"}
-            </small>
-          </div>
-          <ArrowUpRight size={16} />
-        </a>
-      </aside>
-      <main>
+    <div className={`app-shell ${collapsed ? "sidebar-collapsed" : ""}`}>
+      <a
+        className="skip-link"
+        href="#workspace"
+        onClick={(event) => {
+          event.preventDefault();
+          document.getElementById("workspace")?.focus();
+        }}
+      >
+        Skip to workspace
+      </a>
+      <Sidebar
+        view={route.view}
+        reportId={selectedId}
+        user={session.data?.user || null}
+        count={reports.data?.length || 0}
+        collapsed={collapsed}
+        onToggle={toggleSidebar}
+      />
+      <main id="workspace" tabIndex={-1}>
         <header className="topbar">
-          <span>
-            Workspace <span className="slash">/</span> {labels[route.view]}
-          </span>
+          <div className="topbar-location">
+            <button
+              className="layout-toggle"
+              onClick={toggleSidebar}
+              aria-label={collapsed ? "Expand sidebar" : "Minimize sidebar"}
+              title={collapsed ? "Expand sidebar" : "Minimize sidebar"}
+              aria-expanded={!collapsed}
+              aria-controls="sidebar-navigation"
+            >
+              {collapsed ? (
+                <PanelLeftOpen size={19} />
+              ) : (
+                <PanelLeftClose size={19} />
+              )}
+            </button>
+            <span className="breadcrumb">
+              Workspace <span className="slash">/</span> {labels[route.view]}
+            </span>
+          </div>
           <div className="topbar-actions">
             <a href="#guide" className="topbar-guide">
               <BookOpen size={16} />

@@ -85,7 +85,7 @@ export default function ReportHistory({
             <Search size={17} />
             <input
               aria-label="Search saved reports"
-              placeholder="Find a datasetâ€¦"
+              placeholder="Find a dataset..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
@@ -101,7 +101,7 @@ export default function ReportHistory({
         </div>
         {loading ? (
           <div className="table-message" role="status">
-            Loading reportsâ€¦
+            Loading reports...
           </div>
         ) : error ? (
           <div className="table-message inline-error" role="alert">
@@ -156,8 +156,8 @@ export default function ReportHistory({
                             {r.name}
                           </button>
                           <small>
-                            {bytes(r.byte_size)} Â· {r.column_count} columns
-                            {r.sample ? " Â· Sample" : ""}
+                            {bytes(r.byte_size)} · {r.column_count} columns
+                            {r.sample ? " · Example dataset" : ""}
                           </small>
                         </div>
                       </div>

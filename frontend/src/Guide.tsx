@@ -57,7 +57,7 @@ export default function Guide({
   const Icon = current.icon;
   return (
     <>
-      <div className="page-heading">
+      <div className="page-heading guide-hero">
         <div>
           <div className="eyebrow">MEET YOUR DATA WORKSPACE</div>
           <h1>Messy spreadsheet. Clear next step.</h1>

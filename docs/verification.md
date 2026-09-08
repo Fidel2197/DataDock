@@ -30,6 +30,8 @@ The Python suite emits two dependency deprecation warnings from Starlette/AnyIO'
 
 ## Reproduce
 
+September 8 interface revision: four frontend tests and the TypeScript/Vite production build passed. The sidebar overflow was traced to fixed viewport height with visible overflowing children. Shell styles were consolidated into `layout.css`, with bounded sidebar scrolling, nonshrinking contents, an account control near the top, responsive collapse behavior, and natural document scrolling. Uploaded user screenshots informed the fix; this revision did not include a browser interaction or visual audit.
+
 ```bash
 cd backend
 python -m ruff check .

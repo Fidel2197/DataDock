@@ -75,33 +75,21 @@ export default function Uploads({
   }
   return (
     <>
-      <div className="page-heading">
+      <section className="workspace-hero">
         <div>
-          <div className="eyebrow">A CLEARER START</div>
-          <h1>
-            From spreadsheet to{" "}
-            <span className="accent-word">clear insight.</span>
-          </h1>
-          <p>Bring your CSV. Weâ€™ll help you make sense of it.</p>
-        </div>
-        <button className="button secondary guide-shortcut" onClick={onGuide}>
-          <BookOpen size={17} />
-          How it works
-        </button>
-      </div>
-      <div className="workspace-intro">
-        <span className="intro-icon">
-          <ScanLine size={22} />
-        </span>
-        <div>
-          <strong>Your data, with a little more clarity.</strong>
+          <div className="eyebrow">YOUR DATA WORKSPACE</div>
+          <h1>Your data, in focus.</h1>
           <p>
-            Bring a research sheet, expense log, or operations report. Start
-            with your file or explore the example below.
+            Find gaps, clean up duplicates, and turn your CSV into a report you
+            can use.
           </p>
+          <button className="hero-guide" onClick={onGuide}>
+            <BookOpen size={16} />
+            Take the quick tour
+            <ArrowUpRight size={16} />
+          </button>
         </div>
-        <span className="intro-label">UPLOAD → UNDERSTAND → EXPORT</span>
-      </div>
+      </section>
       <div className="upload-layout">
         <div>
           <section
@@ -132,8 +120,8 @@ export default function Uploads({
             <h2>
               {busy
                 ? progress === 100
-                  ? "Finding the story in your dataâ€¦"
-                  : "Bringing your dataset aboardâ€¦"
+                  ? "Analyzing your dataset..."
+                  : "Uploading your dataset..."
                 : "Drop a dataset into your workspace"}
             </h2>
             <p>
@@ -172,12 +160,12 @@ export default function Uploads({
                 <small>
                   {progress < 100
                     ? `${progress}% uploaded`
-                    : "Upload complete Â· Checking columns and saving your report"}
+                    : "Upload complete · Checking columns and saving your report"}
                 </small>
               </div>
             ) : (
               <small>
-                UTF-8 CSV Â· Up to 10 MB Â· 100,000 rows Â· 64 columns
+                UTF-8 CSV · Up to {maxUploadMb} MB · 100,000 rows · 64 columns
               </small>
             )}
             {error && (
@@ -260,7 +248,7 @@ export default function Uploads({
               <div>
                 <strong>{r.name}</strong>
                 <small>
-                  {number(r.row_count)} rows Â· {bytes(r.byte_size)} Â·{" "}
+                  {number(r.row_count)} rows · {bytes(r.byte_size)} ·{" "}
                   {date(r.created_at)}
                 </small>
               </div>
