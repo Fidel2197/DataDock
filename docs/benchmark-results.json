@@ -1,0 +1,25 @@
+{
+  "environment": {
+    "platform": "Windows-11-10.0.26200-SP0",
+    "python": "3.12.14",
+    "pandas": "2.3.3"
+  },
+  "dataset": {
+    "rows": 10000,
+    "columns": 8,
+    "source": "deterministic synthetic sample repeated to 10000 records"
+  },
+  "checks": [
+    "blank cells",
+    "duplicate rows after trimming",
+    "whitespace changes"
+  ],
+  "repetitions": 5,
+  "median_loop_ms": 284.11,
+  "median_vectorized_ms": 25.2,
+  "speedup": 11.27,
+  "results_match": true,
+  "all_rows_json_bytes": 1936833,
+  "25_rows_json_bytes": 4841,
+  "scope": "Local microbenchmark of three equivalent checks and plain row serialization. Excludes upload, network, database writes, additional profiling, API wrappers, and concurrent users."
+}

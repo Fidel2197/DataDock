@@ -1,0 +1,37 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Optional GitLab OIDC deploy role restricted to one project main branch and one DataDock EC2 instance. Use an existing GitLab OIDC provider.
+Parameters:
+  GitLabProviderArn: {Type: String}
+  GitLabProjectPath:
+    Type: String
+    Description: Exact namespace/project, for example fidel2197/datadock
+  InstanceId: {Type: AWS::EC2::Instance::Id}
+Resources:
+  DeployRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal: {Federated: !Ref GitLabProviderArn}
+            Action: sts:AssumeRoleWithWebIdentity
+            Condition:
+              StringEquals:
+                gitlab.com:aud: sts.amazonaws.com
+                gitlab.com:sub: !Sub 'project_path:${GitLabProjectPath}:ref_type:branch:ref:main'
+      Policies:
+        - PolicyName: DeployOnlyDataDock
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: ssm:SendCommand
+                Resource:
+                  - !Sub 'arn:${AWS::Partition}:ec2:${AWS::Region}:${AWS::AccountId}:instance/${InstanceId}'
+                  - !Sub 'arn:${AWS::Partition}:ssm:${AWS::Region}::document/AWS-RunShellScript'
+              - Effect: Allow
+                Action: ssm:GetCommandInvocation
+                Resource: '*'
+Outputs:
+  DeployRoleArn: {Value: !GetAtt DeployRole.Arn}

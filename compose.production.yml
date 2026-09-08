@@ -1,0 +1,46 @@
+name: datadock
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: datadock
+      POSTGRES_USER: datadock
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?required}
+    volumes: ["postgres_data:/var/lib/postgresql/data"]
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -U datadock -d datadock"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+    restart: unless-stopped
+    logging: &logging
+      driver: json-file
+      options: {max-size: "10m", max-file: "3"}
+  api:
+    image: ${API_IMAGE:?required}
+    environment:
+      DATABASE_URL: postgresql+psycopg://datadock:${POSTGRES_PASSWORD}@db:5432/datadock
+      STORAGE_DIR: /app/data/uploads
+      S3_BUCKET: ${S3_BUCKET:?required}
+      AWS_REGION: ${AWS_REGION:-us-east-1}
+      SECURE_COOKIES: "true"
+      MAX_REPORTS_TOTAL: ${MAX_REPORTS_TOTAL:-500}
+    depends_on:
+      db: {condition: service_healthy}
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/health')"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+    logging: *logging
+  web:
+    image: ${WEB_IMAGE:?required}
+    ports: ["127.0.0.1:8080:80"]
+    depends_on:
+      api: {condition: service_healthy}
+    restart: unless-stopped
+    logging: *logging
+volumes:
+  postgres_data:
