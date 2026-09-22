@@ -1,57 +1,115 @@
 # DataDock
 
-A working data quality and reporting portal built for research assistants and operations analysts. Upload a messy CSV, inspect row-level issues, compare categories, and download a cleaned copy without changing the original.
+DataDock is a data quality and reporting application built with React, TypeScript, and Python. Upload a CSV, inspect missing values and duplicates, explore charts, and download a cleaned copy while keeping the original file intact.
 
-**Stack:** React 19, TypeScript, TanStack Query, Recharts, FastAPI, pandas, NumPy, SQLAlchemy, and PostgreSQL. The Vercel deployment runs the actual Python API and stores accounts, reports, rows, and original uploads in a dedicated hosted PostgreSQL database. Docker Compose and an alternative AWS EC2/S3 deployment are also configured.
+## Links
 
-**Live app:** [datadock-fidel2197.vercel.app](https://datadock-fidel2197.vercel.app/) · [Quick guide](https://datadock-fidel2197.vercel.app/#guide) · [Fidel's portfolio](https://fidel-portfolio-eta.vercel.app/#datadock)
+- [Open DataDock](https://datadock-fidel2197.vercel.app/)
+- [Quick guide](https://datadock-fidel2197.vercel.app/#guide)
+- [Repository](https://github.com/Fidel2197/DataDock)
+- [Project page](https://fidel-portfolio-eta.vercel.app/datadock.html)
 
-**Verified online:** uploads, account creation, cross-device sign-in, private report access, charts, CSV/JSON downloads, password recovery, and session revocation on Vercel with Neon PostgreSQL.
+## Overview
 
-## Try the application
+DataDock helps research assistants and operations analysts understand a spreadsheet before using it in a report. It combines row-level quality checks with filtering, charts, and optional cleanup steps. Visitors can start as guests or create an account to keep reports available across devices.
 
-1. Open **Uploads**, bring your own CSV, or select **Open example**.
-2. The sample contains 246 synthetic research spending records: 12 missing cells, 6 duplicates, 3 invalid numeric values, 2 outlier suggestions, and 6 cells with extra spaces.
-3. On **Data review**, select **Issues only**, search `pending`, or expand a flagged row.
-4. Apply cleaning options. The default options retain 240 records. Missing data and unusual numbers remain for human review.
-5. Open **Dashboard** and compare actual spending by department. Change the measure, grouping, and aggregation.
-6. Download the cleaned CSV or JSON report, then reopen the report from **Report history**.
+The live application runs on Vercel with a FastAPI backend and hosted PostgreSQL database. Accounts, reports, rows, and original uploads are stored in the database. Docker Compose and AWS deployment configurations are also included as alternative hosting options.
 
-The included example is synthetic. **Quick guide** explains each step. **Your account** lets visitors register, sign in, or recover their password with a private recovery code; guests can continue without an account.
+## Features
 
-## Local development
+- CSV uploads with file-size, row, column, and header validation
+- Missing-value, duplicate, whitespace, and numeric-quality checks
+- Searchable, paginated tables with row-level issue details
+- Charts with selectable measures, grouping, and aggregation
+- Optional cleanup with CSV and JSON exports
+- Guest workspaces and account-based report history
+- Password recovery through a private, one-time recovery code
+- Ownership checks, revocable sessions, and account-isolation tests
+- Responsive layout, collapsible navigation, and an in-app guide
+- Lazy-loaded charts, cached remote state, and server-side filtering
 
-Requirements: Python 3.12 and Node 24. From this project directory:
+## Technologies Used
 
-```powershell
+- React 19, TypeScript, and Vite
+- TanStack Query for remote state and Recharts for visualization
+- Python, FastAPI, pandas, and NumPy
+- SQLAlchemy and PostgreSQL; SQLite for local development
+- Docker Compose and Nginx for the containerized hosting option
+- pytest, Ruff, Vitest, and GitHub Actions
+- Vercel and Neon PostgreSQL for the live deployment
+
+## Using DataDock
+
+1. Open **Uploads** and choose a CSV, or select **Open example** to use the included synthetic dataset.
+2. Review the quality summary and use **Issues only** to inspect flagged rows.
+3. Choose cleanup options, such as trimming spaces or removing duplicate rows.
+4. Open **Dashboard** to compare categories and change the chart measure or aggregation.
+5. Download a cleaned CSV or JSON report. Saved reports remain available in **Report history**.
+
+Cleaning is optional. Missing values and unusual numbers remain available for review rather than being filled or removed automatically. Create an account for cross-device access, and keep the recovery code somewhere safe.
+
+## Project Structure
+
+```text
+DataDock/
+  frontend/        # React interface and frontend tests
+  backend/         # FastAPI application, analysis, storage, and tests
+  api/             # Vercel Python entry point
+  deploy/          # Nginx, AWS, and release configuration
+  scripts/         # Development, smoke checks, and benchmarks
+  docs/            # Architecture, deployment, and performance documentation
+  compose.yml      # Local Docker stack
+```
+
+## Getting Started
+
+Use Python 3.12 and Node.js 24.
+
+```bash
+git clone https://github.com/Fidel2197/DataDock.git
+cd DataDock
 python -m venv .venv
-.\.venv\Scripts\python.exe -m pip install -r backend\requirements.txt
+```
+
+Activate the virtual environment (`source .venv/bin/activate` on macOS/Linux or `.\.venv\Scripts\Activate.ps1` in PowerShell), then install dependencies:
+
+```bash
+python -m pip install -r backend/requirements.txt
 cd frontend
 npm ci
 cd ..
-.\scripts\start-local.ps1
 ```
 
-Open http://127.0.0.1:5178/. API listens at http://127.0.0.1:8010, with OpenAPI at `/api/openapi.json`. The Vite proxy keeps cookies and API requests on the same origin. Servers run as hidden processes; `.local/processes.json` and `.local/*log` identify them. Do not run the starter twice on the same ports.
-
-Cross-platform manual commands, in separate terminals:
+Start the API from the repository root:
 
 ```bash
 python -m uvicorn app.main:app --app-dir backend --host 127.0.0.1 --port 8010
-cd frontend && npm run dev
 ```
 
-## Run with Docker and PostgreSQL
+In another terminal, start the interface:
 
-Copy `.env.example` to `.env`. Set `POSTGRES_PASSWORD` to a generated random hexadecimal value. Then:
+```bash
+cd frontend
+npm run dev
+```
+
+Open [localhost:5178](http://127.0.0.1:5178/). Vite proxies `/api` to the backend at port 8010. Local development uses SQLite and filesystem storage by default; API documentation is available at `/api/openapi.json`.
+
+On Windows, `scripts/start-local.ps1` can start both servers after dependencies are installed. Its process IDs and logs are written to `.local/`.
+
+### Docker and PostgreSQL
+
+Copy `.env.example` to `.env` and set `POSTGRES_PASSWORD` to a generated random hexadecimal value.
 
 ```bash
 docker compose up --build -d --wait
 ```
 
-Open http://localhost:8080/. Only Nginx is bound to localhost; database and API are internal. Named volumes preserve PostgreSQL and uploads across restarts. `docker compose down` stops services without deleting volumes.
+Open [localhost:8080](http://localhost:8080/). Nginx serves the application; the API and database stay on the internal container network. Named volumes preserve data when services restart. `docker compose down` stops the stack without deleting those volumes.
 
-## Verification
+## Tests and Production Build
+
+With the Python virtual environment active:
 
 ```bash
 cd backend
@@ -59,30 +117,28 @@ python -m ruff check .
 python -m ruff format --check .
 python -m pytest
 cd ../frontend
+npm test
 npm run build
 ```
 
-See [verification](docs/verification.md) for checks actually run, and [performance](docs/performance.md) for measured results and their limits. Source files are formatted with Ruff and Prettier.
+GitHub Actions runs backend tests against PostgreSQL, frontend checks, and container builds. Tests cover analysis rules, uploads, report ownership, authentication, sessions, and storage behavior. See the [verification notes](docs/verification.md) and [performance results](docs/performance.md) for additional details.
 
-## Design and behavior
+## Data and Accounts
 
-- Six focused views: uploads, data review, dashboard, report history, quick guide, and account.
-- Collapsible navigation with an elevated account control. The sidebar contains its own overflow on short viewports; the main document scrolls normally, and route changes return to the top.
-- Coordinated WebP backgrounds add visual detail to introductions while keeping data tables and charts clear. See [visual assets and prompts](docs/visual-assets.md).
-- TanStack Query handles remote state, caching, loading, errors, and mutation invalidation. React owns filters and export options.
-- Charts are lazy-loaded; table reads are paginated and indexed by report/row. Search is debounced and performed on the server.
-- Hosted uploads are UTF-8 CSV, at most 3 MB, 100,000 records, 64 columns, and one million cells. The local/Docker default is 10 MB. The API supplies the active limit to the interface.
-- Duplicates compare all trimmed fields. Numeric inference needs 80% finite numeric values and excludes identifiers. Outliers use the 1.5× IQR rule and are suggestions, not mistakes to erase.
-- Headers, leading-zero identifiers, quoted multiline fields, and literal `NA`/`null` are preserved. Only blank or whitespace-only cells count as missing.
-- Export cleaning is opt-in and repeatable. Formula-like strings in CSV exports receive an apostrophe for safer spreadsheet opening; finite negative numbers remain numeric.
-- Reports belong to a guest session or named account. Each report route checks ownership. Sessions use opaque HttpOnly cookies, database-side revocation, a 30-day expiry, and CSRF protection. Vercel always uses Secure cookies.
-- Passwords use scrypt with random salts. Account recovery uses a high-entropy, one-time recovery code stored only as a hash. Resetting a password rotates that code and revokes other sessions. No email delivery is required.
-- Signing in can transfer current guest reports into the account. Auth transitions clear cached report data, and account operations are rate-limited in the database.
+- Every report belongs to a guest session or named account, and report routes check ownership.
+- Passwords use salted scrypt hashes. Sessions use HttpOnly cookies, CSRF protection, expiry, and database-side revocation.
+- Recovery uses a hashed, one-time code rather than email. Resetting a password rotates the code and revokes other sessions.
+- Signing in can transfer guest reports to the account. Without an account, access depends on the browser's session cookie.
+- Headers, leading-zero identifiers, quoted multiline fields, and literal `NA`/`null` values are preserved. Formula-like export values receive an apostrophe for safer spreadsheet opening.
 
-## Architecture and deployment
+## Deployment and Limitations
 
-See [architecture](docs/architecture.md), [Vercel deployment](docs/vercel-deployment.md), [AWS runbook](docs/aws-deployment.md), and [development backlog](docs/backlog.md).
+The live deployment uses Vercel and Neon PostgreSQL. See the [Vercel setup](docs/vercel-deployment.md), [architecture](docs/architecture.md), and [AWS runbook](docs/aws-deployment.md) for hosting details. The AWS EC2/S3 templates and GitLab deployment pipeline are configuration examples; they have not been deployed or operated for this application.
 
-GitHub Actions runs Python tests against PostgreSQL, frontend checks, and container builds. The GitLab pipeline additionally configures immutable image publication and a manual AWS rollout with rollback. AWS resources and GitLab pipeline execution have not been deployed or operated; the repository documents this distinction.
+Hosted CSV uploads are limited to 3 MB, 100,000 rows, 64 columns, and one million cells. Local and Docker installations default to a 10 MB upload limit. Workspaces support up to 30 reports. Shared teams, background processing, email recovery, and automatic retention are not implemented.
 
-Workspaces have a 30-report limit. Shared teams, background jobs, email recovery, and retention automation are not implemented. Guest access depends on the browser cookie; an account preserves access across devices. Save the recovery code when creating an account.
+Numeric inference uses heuristics, and outlier flags are suggestions for review. Charts summarize the original data; export cleanup does not overwrite that source.
+
+## Author
+
+Built by Fidel Anyanwu.
