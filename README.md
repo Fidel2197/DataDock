@@ -1,13 +1,14 @@
 # DataDock
 
-DataDock is a data quality and reporting application built with React, TypeScript, and Python. Upload a CSV, inspect missing values and duplicates, explore charts, and download a cleaned copy while keeping the original file intact.
+A CSV data-quality workspace built with React, FastAPI, pandas, and PostgreSQL. Inspect missing values and duplicates, explore charts, and export a cleaned copy while keeping the original intact.
 
-## Links
+[![DataDock CI](https://github.com/Fidel2197/DataDock/actions/workflows/checks.yml/badge.svg?branch=main)](https://github.com/Fidel2197/DataDock/actions/workflows/checks.yml)
 
-- [Open DataDock](https://datadock-fidel2197.vercel.app/)
-- [Quick guide](https://datadock-fidel2197.vercel.app/#guide)
-- [Repository](https://github.com/Fidel2197/DataDock)
-- [Project page](https://fidel-portfolio-eta.vercel.app/datadock.html)
+[Open app](https://datadock-fidel2197.vercel.app/) · [Project page](https://fidel-portfolio-eta.vercel.app/datadock.html) · [Quick guide](https://datadock-fidel2197.vercel.app/#guide)
+
+![DataDock upload workspace with CSV quality guidance and account navigation](docs/images/datadock-workspace.png)
+
+**Technical highlights:** full-stack architecture, private accounts, Python data analysis, ownership tests, Docker Compose, and a deployed PostgreSQL-backed API.
 
 ## Overview
 
