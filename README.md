@@ -1,6 +1,6 @@
 # DataDock
 
-A CSV data-quality workspace built with React, FastAPI, pandas, and PostgreSQL. Inspect missing values and duplicates, explore charts, and export a cleaned copy while keeping the original intact.
+DataDock checks CSV files for missing values, duplicates, and inconsistent numbers. Review the results, choose cleanup options, and export a new copy. Built with React, FastAPI, pandas, and PostgreSQL.
 
 [![DataDock CI](https://github.com/Fidel2197/DataDock/actions/workflows/checks.yml/badge.svg?branch=main)](https://github.com/Fidel2197/DataDock/actions/workflows/checks.yml)
 
