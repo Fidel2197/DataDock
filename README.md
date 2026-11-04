@@ -8,13 +8,11 @@ DataDock checks CSV files for missing values, duplicates, and inconsistent numbe
 
 ![DataDock upload workspace with CSV quality guidance and account navigation](docs/images/datadock-workspace.png)
 
-**Technical highlights:** full-stack architecture, private accounts, Python data analysis, ownership tests, Docker Compose, and a deployed PostgreSQL-backed API.
+## How it works
 
-## Overview
+The React frontend uploads CSV files to FastAPI for analysis with pandas and NumPy. PostgreSQL stores accounts, reports, rows, and original files. Guests can start without an account; registered users can access reports across devices.
 
-DataDock helps research assistants and operations analysts understand a spreadsheet before using it in a report. It combines row-level quality checks with filtering, charts, and optional cleanup steps. Visitors can start as guests or create an account to keep reports available across devices.
-
-The live application runs on Vercel with a FastAPI backend and hosted PostgreSQL database. Accounts, reports, rows, and original uploads are stored in the database. Docker Compose and AWS deployment configurations are also included as alternative hosting options.
+The live app uses Vercel and Neon PostgreSQL. Docker Compose and AWS configurations are included for alternative hosting.
 
 ## Features
 
